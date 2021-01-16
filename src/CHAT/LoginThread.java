@@ -1,7 +1,5 @@
 package CHAT;
 
-import sun.security.krb5.internal.PAData;
-import sun.security.util.Password;
 import unti.MD5;
 
 import java.awt.BorderLayout;
@@ -9,9 +7,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import javax.swing.JButton;
@@ -85,6 +81,7 @@ public class LoginThread extends Thread {
          */
         class ButtonListener implements ActionListener {
             private Socket s;
+
             public void actionPerformed(ActionEvent e) {
                 String username = loginname.getText();
                 String password = loginPassword.getText();
@@ -95,22 +92,35 @@ public class LoginThread extends Thread {
                     String username1="opts";
                     String password1="opts1234";
                     Connection conn = DriverManager.getConnection(url, username1, password1);
+                    sql = "SELECT password FROM users WHERE username=?";
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1,username);
                     ResultSet rs = pstmt.executeQuery();
                     if (rs.next()){
                         String encodePassword=rs.getString("PASSWORD");
-
                         if(MD5.checkpassword(password,encodePassword)) {
+                            //获取本机IP，开启一个端口，隐藏登录界面，显示聊天记录
                             InetAddress addr =InetAddress.getLocalHost();
                             System.out.println("本机IP地址："+addr.getHostAddress());
-                            sql = "SELECT password FROM users WHERE username=?";
+                            int port=1688;
+                            DatagramSocket ds=null;
+                            while(true){
+                                try {
+                                   ds = new DatagramSocket(port);
+                                   break;
+                                }catch (IOException ex){
+                                    port +=1;
+                                }
+                            }
+                            sql= "UPDATE users SET ip=?,port=?,status=? WHERE username=?";
                             pstmt = conn.prepareStatement(sql);
-                            pstmt.setString(1,addr.getHostAddress());
-                            pstmt.setString(2,username);
-                            pstmt.executeQuery();
+                            pstmt.setString(1, addr.getHostAddress());
+                            pstmt.setInt(2,port);
+                            pstmt.setString(3,"online");
+                            pstmt.setString(4, username);
+                            pstmt.executeUpdate();
                             loginf.setVisible(false);
-                            ChatThreadWindow chatThreadWindow=new ChatThreadWindow();
+                            ChatThreadWindow chatThreadWindow = new ChatThreadWindow(username,ds);
                         }
                         else {
                             System.out.println("登录失败");
