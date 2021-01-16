@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
             BASE64Encoder base64en = new BASE64Encoder();
             //加密后的字符串
             String newstr=base64en.encode(md5.digest(str.getBytes("utf-8")));
+           // System.out.println(newstr);
             return newstr;
         }
         /**判断用户密码是否正确
@@ -30,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
          */
         public static boolean checkpassword(String newpasswd,String oldpasswd) throws NoSuchAlgorithmException, UnsupportedEncodingException{
             if(encoderByMd5(newpasswd).equals(oldpasswd))
+
                 return true;
             else
                 return false;

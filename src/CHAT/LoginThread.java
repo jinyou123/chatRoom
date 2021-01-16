@@ -48,7 +48,7 @@ public class LoginThread extends Thread {
         t1.setEditable(false);
         loginp.add(t1);
 
-        final JTextField loginname = new JTextField("liwei");
+        final JTextField loginname = new JTextField("lyl");
         loginname.setHorizontalAlignment(JTextField.CENTER);
         loginp.add(loginname);
 
@@ -57,7 +57,7 @@ public class LoginThread extends Thread {
         t2.setEditable(false);
         loginp.add(t2);
 
-        final JTextField loginPassword = new JTextField("lw1234");
+        final JTextField loginPassword = new JTextField("lyl1234");
         loginPassword.setHorizontalAlignment(JTextField.CENTER);
         loginp.add(loginPassword);
         /*
@@ -96,14 +96,18 @@ public class LoginThread extends Thread {
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1,username);
                     ResultSet rs = pstmt.executeQuery();
+
                     if (rs.next()){
                         String encodePassword=rs.getString("PASSWORD");
+                        //InetAddress addr =InetAddress.getLocalHost();
+                        //System.out.println("本机IP地址："+addr.getHostAddress());
                         if(MD5.checkpassword(password,encodePassword)) {
                             //获取本机IP，开启一个端口，隐藏登录界面，显示聊天记录
-                            InetAddress addr =InetAddress.getLocalHost();
+                           InetAddress addr =InetAddress.getLocalHost();
                             System.out.println("本机IP地址："+addr.getHostAddress());
                             int port=1688;
                             DatagramSocket ds=null;
+                            System.out.println("登录成功");
                             while(true){
                                 try {
                                    ds = new DatagramSocket(port);
